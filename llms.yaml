@@ -1,0 +1,53 @@
+leo13b:
+  repo_id: 'LeoLM/leo-hessianai-13b'
+  surp_id: 'leo13b_surp'
+  bpe_id: 'leo13b_bpe_split'
+  ws_ind: '▁' # Unicode code point is U+2581, not U+005F
+  char_repl: False
+  bos_pad: False
+  lang: 'de'
+
+llammlein7b: # 32 layers
+  repo_id: 'LSX-UniWue/LLaMmlein_7B'
+  surp_id: 'llammlein7b_surp'
+  bpe_id: 'llammlein7b_bpe_split'
+  ws_ind: '▁' # Unicode code point is U+2581, not U+005F
+  char_repl: False
+  bos_pad: False
+  lang: 'de'
+
+llammlein1b: # 22 layers
+  repo_id: 'LSX-UniWue/LLaMmlein_1B'
+  surp_id: 'llammlein1b_surp'
+  bpe_id: 'llammlein1b_bpe_split'
+  ws_ind: '▁' # Unicode code point is U+2581, not U+005F
+  char_repl: False
+  bos_pad: False
+  lang: 'de'
+
+llammlein120m: # 12 layers
+  repo_id: 'LSX-UniWue/LLaMmlein_120M'
+  surp_id: 'llammlein120m_surp'
+  bpe_id: 'llammlein120m_bpe_split'
+  ws_ind: '▁' # Unicode code point is U+2581, not U+005F
+  char_repl: False
+  bos_pad: False
+  lang: 'de'
+
+gerpt2: # 12 layers
+  repo_id: 'benjamin/gerpt2'
+  surp_id: 'gerpt2_surp'
+  bpe_id: 'gerpt2_bpe_split'
+  ws_ind: 'Ġ'
+  char_repl: True
+  bos_pad: True
+  lang: 'de'
+
+gerpt2-large: # 36 layers
+  repo_id: 'benjamin/gerpt2-large'
+  surp_id: 'gerpt2large_surp'
+  bpe_id: 'gerpt2large_bpe_split'
+  ws_ind: 'Ġ'
+  char_repl: True
+  bos_pad: True
+  lang: 'de'
