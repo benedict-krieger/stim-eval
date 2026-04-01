@@ -8,7 +8,7 @@ A collection of tools to evaluate stimulus materials for psycholinguistic experi
 
 Planned branches:
 
--  Local (main)
+- Local (main)
 - Tortoise CPU server
 - Coli GPU cluster
 
@@ -20,6 +20,11 @@ Mandatory columns:
 - "Target": the target word
 
 
+## LLM surprisal
+
 Output columns:
 
 - "\[llm_name\]_surp": surprisal estimates from the specified large language model
+
+
+## Semantic relatedness

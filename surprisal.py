@@ -5,17 +5,12 @@ import torch.nn.functional as F
 from transformers import AutoTokenizer, AutoModelForCausalLM
 import transformers,torch
 from wordfreq import zipf_frequency
+import seaborn as sns
+import matplotlib.pyplot as plt
 import yaml
 from pathlib import Path
 
 
-def get_config(llm_name):
-    '''Load model config'''
-    with open(f"llms.yaml", "r") as f:
-        llms = yaml.safe_load(f)
-        llm_cfg = llms[llm_name]
-
-    return llm_cfg
 
 
 def chunkstring(string, length):
@@ -125,7 +120,7 @@ def get_surprisal(input_str, model, tokenizer, ws_ind, char_repl, bos_pad):
     return words, surprisals
 
 
-def bpe_split(word, bos_pad):
+def bpe_split(word, tokenizer, bos_pad):
 
     '''
     Test if a given (target) word is split by the tokenizer into multiple subwords.
@@ -157,56 +152,109 @@ def process_row(row, model, tokenizer, ws_ind, char_repl, bos_pad, surp_id, lang
     last_occurrence = max([j for j, w in enumerate(words) if w == row['Target']], default=-1)
 
     return pd.DataFrame({
-        **{col: row[col] for col in df.columns},  
-        'Word_Position': list(range(len(words))),  
-        'Word': words,  
+        **{col: row[col] for col in row.index},  
+        'word_Position': list(range(len(words))),  
+        'word': words,  
         f'{surp_id}': surprisals,  
-        'Is_Target': [1 if i == last_occurrence else 0 for i in range(len(words))],
-        'Word_Freq': word_freqs,
-        'Word_Length': word_lengths  
+        'is_target': [1 if i == last_occurrence else 0 for i in range(len(words))],
+        'word_freq': word_freqs,
+        'word_length': word_lengths  
     })
 
 def get_word_freqs(word_list, lang):
     zipf_freqs = [zipf_frequency(w, lang, 'large') for w in word_list]
     return zipf_freqs
 
-###########################################################################################
-###########################################################################################
 
-if __name__ == '__main__':
+def merge_surprisal(user,data):
 
-    all_models = ['leo13b','gerpt2','gerpt2-large','gpt2']
-    #base_model_path = "/scratch/common_models"
+    files = list(Path(f"{user}/results/llm-surprisal").glob("*.tsv"))
+    final_df = pd.read_csv(files[0], sep='\t')
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-u','--user',help=f'User name, for which a sub-directory must exist')
-    parser.add_argument('-d','--data',help = f'Input csv file, tab separated')
-    parser.add_argument('-m','--model',help = f'Models:{all_models}')
-    args = parser.parse_args()
+    print(f"Shape before merging: {final_df.shape}")
 
-    llm_name = args.model
-    llm_cfg = get_config(llm_name)
-    repo_id = llm_cfg['repo_id']
-    surp_id = llm_cfg['surp_id']
-    bpe_id = llm_cfg['bpe_id']
-    ws_ind = llm_cfg['ws_ind']
-    char_repl = llm_cfg['char_repl']
-    bos_pad = llm_cfg['bos_pad']
-    lang = llm_cfg['lang']
+    for f in files[1:]:
+        next_df = pd.read_csv(f, sep='\t')
+        
+        model_col = [c for c in next_df.columns if c.endswith("_surp")][0]
+        
+        join_keys = ['ItemNum', 'Condition' ,'word_Position', 'word']
+        
+        final_df = final_df.merge(
+            next_df[join_keys + [model_col]], 
+            on=join_keys,
+            how='left'
+        )
+
+    print(f"Shape after merging: {final_df.shape}")
+
+    filename = Path(data).stem
+    final_df.to_csv(f"{user}/results/llm-surprisal/{filename}_merged.tsv", sep='\t', index=False)
 
 
 
-    print(f'Model id: {llm_name}')
-    device_arg = "auto" if torch.cuda.is_available() else None
-    dtype_arg = torch.float16 if torch.cuda.is_available() else torch.float32
-    tokenizer = AutoTokenizer.from_pretrained(repo_id, add_prefix_space=True)
-    model = AutoModelForCausalLM.from_pretrained(repo_id,device_map=device_arg,dtype=dtype_arg)
-    print(f"Model on {model.device}")
+#######################
+#### Density plots ####
+#######################
+
+def add_vlines(df, col_name, surp_id, c_palette):
+
+    '''
+    Adding vertical mean lines to density plots. 
+    '''
     
-    df = pd.read_csv(f'{args.user}/data/{args.data}', sep ="\t")
-    filename = Path(args.data).stem
-    long_df = df.apply(process_row, axis=1, args=(model,tokenizer,ws_ind,char_repl, bos_pad, surp_id, lang))
-    long_df = pd.concat(long_df.values, ignore_index=True)
-    results_path = f'{args.user}/results'
-    Path(results_path).mkdir(parents=True, exist_ok=True)
-    long_df.to_csv(f'{results_path}/{filename}_{llm_name}.csv', sep='\t', index = False)
+    col_vals = list(df[col_name].unique())
+    for val in col_vals:
+        df_val = df[df[col_name] == val].copy()
+        val_surprisals = df_val[surp_id]
+        mean = np.mean(val_surprisals)
+        val_idx = col_vals.index(val)
+        color = c_palette[val_idx]
+        plt.axvline(mean, c=color, linestyle='--')
+
+
+def kde_plot_conditions(df, surp_id, outpath,
+                        c_palette=sns.color_palette(), xlim=None ,ylim=None, title=None):
+
+    '''
+    Generating density plots (kernel density estimation) per study,llm and condition.
+
+    df (DataFrame) : study-specific dataframe containing surprisal values
+    surp_id (str) : which LLM's surprisal values to plot
+    title (str) : optional title
+    '''
+
+    assert len(c_palette) >= len(df['Condition'].unique())
+
+
+    plt.figure(figsize=(4,4))
+    sns.set(style='darkgrid')
+    plot = sns.kdeplot(data=df,
+                       x=surp_id,
+                       hue='Condition',
+                       palette=c_palette,
+                       clip=(0,xlim),
+                       fill=True,
+                       )
+    
+                        
+    plot.set_xlabel(None)
+    if xlim is not None:
+        plot.set_xlim(0,xlim)
+    plot.set_ylabel("Density", fontsize = 11)
+    if ylim is not None:
+        plot.set_ylim(0,ylim) 
+
+    plot.set_title(title)
+
+    add_vlines(df, 'Condition', surp_id, c_palette)
+    plt.legend('', frameon=False)
+    
+    plt.tight_layout()
+    plt.savefig(outpath)
+    plt.close()
+
+
+
+###########################################################################################
+###########################################################################################
