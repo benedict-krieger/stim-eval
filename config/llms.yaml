@@ -43,7 +43,7 @@ gerpt2: # 12 layers
   bos_pad: True
   lang: 'de'
 
-gerpt2-large: # 36 layers
+gerpt2large: # 36 layers
   repo_id: 'benjamin/gerpt2-large'
   surp_id: 'gerpt2large_surp'
   bpe_id: 'gerpt2large_bpe_split'

@@ -1,4 +1,3 @@
-import argparse
 import numpy as np
 import pandas as pd
 import torch.nn.functional as F
@@ -7,7 +6,6 @@ import transformers,torch
 from wordfreq import zipf_frequency
 import seaborn as sns
 import matplotlib.pyplot as plt
-import yaml
 from pathlib import Path
 
 
@@ -156,7 +154,7 @@ def process_row(row, model, tokenizer, ws_ind, char_repl, bos_pad, surp_id, lang
         'word_Position': list(range(len(words))),  
         'word': words,  
         f'{surp_id}': surprisals,  
-        'is_target': [1 if i == last_occurrence else 0 for i in range(len(words))],
+        'is_target': [True if i == last_occurrence else False for i in range(len(words))],
         'word_freq': word_freqs,
         'word_length': word_lengths  
     })
@@ -166,9 +164,16 @@ def get_word_freqs(word_list, lang):
     return zipf_freqs
 
 
-def merge_surprisal(user,data):
+def merge_surprisal(user,exp):
 
-    files = list(Path(f"{user}/results/llm-surprisal").glob("*.tsv"))
+    results_dir = Path(user) / exp / "results" / "llm-surprisal"
+    files = [f for f in results_dir.glob("*.tsv") if "_merged.tsv" not in f.name] # ignore merged files
+    
+    if len(files) < 2:
+        print("Nothing to merge yet.")
+        return
+    
+    
     final_df = pd.read_csv(files[0], sep='\t')
 
     print(f"Shape before merging: {final_df.shape}")
@@ -188,8 +193,8 @@ def merge_surprisal(user,data):
 
     print(f"Shape after merging: {final_df.shape}")
 
-    filename = Path(data).stem
-    final_df.to_csv(f"{user}/results/llm-surprisal/{filename}_merged.tsv", sep='\t', index=False)
+    out_file = results_dir / f"{exp}_merged.tsv"
+    final_df.to_csv(out_file, sep='\t', index=False)
 
 
 
@@ -213,8 +218,9 @@ def add_vlines(df, col_name, surp_id, c_palette):
         plt.axvline(mean, c=color, linestyle='--')
 
 
-def kde_plot_conditions(df, surp_id, outpath,
-                        c_palette=sns.color_palette(), xlim=None ,ylim=None, title=None):
+def kde_plot_conditions_old(df, surp_id, outpath,
+                        c_palette='husl', xlim=None ,ylim=None,
+                        title=None, show_legend=True):
 
     '''
     Generating density plots (kernel density estimation) per study,llm and condition.
@@ -239,22 +245,57 @@ def kde_plot_conditions(df, surp_id, outpath,
     
                         
     plot.set_xlabel(None)
-    if xlim is not None:
-        plot.set_xlim(0,xlim)
+    if xlim: plot.set_xlim(0,xlim)
     plot.set_ylabel("Density", fontsize = 11)
-    if ylim is not None:
-        plot.set_ylim(0,ylim) 
+    if ylim:plot.set_ylim(0,ylim) 
 
     plot.set_title(title)
 
     add_vlines(df, 'Condition', surp_id, c_palette)
-    plt.legend('', frameon=False)
+    
+    if show_legend:
+        # 'bbox_to_anchor' moves it outside the plot area if it's too crowded
+        plt.legend(title='Condition', bbox_to_anchor=(1.05, 1), loc='upper left')
+    else:
+        if plot.get_legend() is not None:
+            plot.get_legend().remove()
     
     plt.tight_layout()
     plt.savefig(outpath)
     plt.close()
 
+def kde_plot_conditions(df, surp_id, outpath,
+                        c_palette='husl', xlim=None, ylim=None,
+                        title=None, show_legend=True):
 
+    unique_conds = df['Condition'].unique()
+    if isinstance(c_palette, list):
+        assert len(c_palette) >= len(unique_conds)
+
+    plt.figure(figsize=(6, 4)) 
+    sns.set(style='darkgrid')
+
+    plot = sns.kdeplot(data=df,
+                       x=surp_id,
+                       hue='Condition',
+                       palette=c_palette,
+                       clip=(0, xlim) if xlim else None,
+                       fill=True,
+                       legend=show_legend
+                       )
+    
+                            
+    plot.set_xlabel("Surprisal")
+    if xlim: plot.set_xlim(0, xlim)
+    plot.set_ylabel("Density", fontsize=11)
+    if ylim: plot.set_ylim(0, ylim) 
+    plot.set_title(title)
+
+    add_vlines(df, 'Condition', surp_id, c_palette)
+    
+    plt.tight_layout()
+    plt.savefig(outpath, bbox_inches='tight')
+    plt.close()
 
 ###########################################################################################
 ###########################################################################################
