@@ -151,7 +151,7 @@ def process_row(row, model, tokenizer, ws_ind, char_repl, bos_pad, surp_id, lang
 
     return pd.DataFrame({
         **{col: row[col] for col in row.index},  
-        'word_Position': list(range(len(words))),  
+        'word_position': list(range(len(words))),  
         'word': words,  
         f'{surp_id}': surprisals,  
         'is_target': [True if i == last_occurrence else False for i in range(len(words))],
@@ -183,7 +183,7 @@ def merge_surprisal(user,exp):
         
         model_col = [c for c in next_df.columns if c.endswith("_surp")][0]
         
-        join_keys = ['ItemNum', 'Condition' ,'word_Position', 'word']
+        join_keys = ['ItemNum', 'Condition' ,'word_position', 'word']
         
         final_df = final_df.merge(
             next_df[join_keys + [model_col]], 

@@ -17,7 +17,9 @@ Takes tab-separated CSV files as input, which have one stimulus per line.
 Mandatory columns:
 
 - "Stimulus": the stimulus sentence including the target word
-- "Target": the target word
+- "Target": the target word, must match the target word in the stimulus column
+- "ItemNum"
+- "Condition"
 
 
 ## LLM surprisal
@@ -25,6 +27,11 @@ Mandatory columns:
 Output columns:
 
 - "\[llm_name\]_surp": surprisal estimates from the specified large language model
+- word
+- word_position
+- word_freq
+- word_length
+- is_target
 
 
 ## Semantic relatedness
