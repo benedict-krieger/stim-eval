@@ -203,74 +203,26 @@ def merge_surprisal(user,exp):
 #######################
 
 def add_vlines(df, col_name, surp_id, c_palette):
-
     '''
     Adding vertical mean lines to density plots. 
     '''
-    
     col_vals = list(df[col_name].unique())
-    for val in col_vals:
-        df_val = df[df[col_name] == val].copy()
-        val_surprisals = df_val[surp_id]
-        mean = np.mean(val_surprisals)
-        val_idx = col_vals.index(val)
-        color = c_palette[val_idx]
-        plt.axvline(mean, c=color, linestyle='--')
+    for i, val in enumerate(col_vals):
+        df_val = df[df[col_name] == val]
+        mean = df_val[surp_id].mean()
+        
+        plt.axvline(mean, c=c_palette[i], linestyle='--', alpha=0.7)
 
 
-def kde_plot_conditions_old(df, surp_id, outpath,
-                        c_palette='husl', xlim=None ,ylim=None,
-                        title=None, show_legend=True):
-
-    '''
-    Generating density plots (kernel density estimation) per study,llm and condition.
-
-    df (DataFrame) : study-specific dataframe containing surprisal values
-    surp_id (str) : which LLM's surprisal values to plot
-    title (str) : optional title
-    '''
-
-    assert len(c_palette) >= len(df['Condition'].unique())
-
-
-    plt.figure(figsize=(4,4))
-    sns.set(style='darkgrid')
-    plot = sns.kdeplot(data=df,
-                       x=surp_id,
-                       hue='Condition',
-                       palette=c_palette,
-                       clip=(0,xlim),
-                       fill=True,
-                       )
-    
-                        
-    plot.set_xlabel(None)
-    if xlim: plot.set_xlim(0,xlim)
-    plot.set_ylabel("Density", fontsize = 11)
-    if ylim:plot.set_ylim(0,ylim) 
-
-    plot.set_title(title)
-
-    add_vlines(df, 'Condition', surp_id, c_palette)
-    
-    if show_legend:
-        # 'bbox_to_anchor' moves it outside the plot area if it's too crowded
-        plt.legend(title='Condition', bbox_to_anchor=(1.05, 1), loc='upper left')
-    else:
-        if plot.get_legend() is not None:
-            plot.get_legend().remove()
-    
-    plt.tight_layout()
-    plt.savefig(outpath)
-    plt.close()
 
 def kde_plot_conditions(df, surp_id, outpath,
                         c_palette='husl', xlim=None, ylim=None,
                         title=None, show_legend=True):
 
     unique_conds = df['Condition'].unique()
-    if isinstance(c_palette, list):
-        assert len(c_palette) >= len(unique_conds)
+    num_conds = len(unique_conds)
+
+    c_palette = sns.color_palette(c_palette, n_colors=num_conds)
 
     plt.figure(figsize=(6, 4)) 
     sns.set(style='darkgrid')

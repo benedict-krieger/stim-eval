@@ -3,7 +3,7 @@
 set -e 
 
 USER_NAME="ben"
-EXP_NAME="adbc23_short"
+EXP_NAME="adbc23"
 MODELS=("gerpt2" "gerpt2large" "leo13b" "llammlein120m" 'llammlein1b' 'llammlein7b')
 
 echo "==========================================="

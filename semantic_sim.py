@@ -5,9 +5,9 @@ import fasttext
 import spacy
 from pathlib import Path
 
-# --- GLOBAL UTILITIES ---
 
 def get_spacy_model(model_name="de_core_news_lg"):
+    """Load spaCy model for stop word removal and lemmatization."""
     try:
         return spacy.load(model_name)
     except OSError:
@@ -15,99 +15,92 @@ def get_spacy_model(model_name="de_core_news_lg"):
         exit(1)
 
 def cosine_sim(v1, v2):
-    """Computes the cosine similarity between two vectors."""
+    """Computes angular distance between two word/sentence vectors."""
     if v1 is None or v2 is None:
         return np.nan
-    norm1 = np.linalg.norm(v1)
-    norm2 = np.linalg.norm(v2)
+    norm1, norm2 = np.linalg.norm(v1), np.linalg.norm(v2)
     if norm1 == 0 or norm2 == 0:
         return 0.0
     return np.dot(v1, v2) / (norm1 * norm2)
 
-# --- CORE LOGIC (The "Worker" Functions) ---
 
-def get_custom_vector(text, nlp, ft_model, use_lemma, use_filter):
-    """Linguistic pipeline: spaCy Cleaning -> FastText Vectors."""
+def get_fasttext_vector(text, nlp, ft_model, use_lemma, use_filter):
+    """
+    Pipeline: 
+    1. (Optionally) transform text with spaCy (Stopword/punctuation filtering and lemmatization).
+    2. Retrieve sub-word aware vectors from fastText.
+    """
     if pd.isna(text) or str(text).strip() == "":
         return None
         
-    doc = nlp(str(text))
+    # Process text, keep casing for spaCy's POS tagger
+    doc = nlp(str(text).strip())
     
     tokens = []
     for token in doc:
+        # Optional filtering: stopwords and punctuation
         if use_filter and (token.is_stop or token.is_punct):
             continue
-        # We use lemma or text based on user preference (No .lower() as requested)
+        # Optional lemmatization
         t = token.lemma_ if use_lemma else token.text
         tokens.append(t)
     
     if not tokens:
         return None
 
-    # Retrieve vectors from FastText and average them
+    # Compute centroid of token vectors
     vectors = [ft_model.get_word_vector(t) for t in tokens]
     return np.mean(vectors, axis=0)
 
-def process_row(row, nlp, ft_model, col1, col2, method, use_lemma, use_filter):
-    """Processes a single row and returns a Series of similarity scores."""
-    t1, t2 = str(row[col1]), str(row[col2])
-    results = {}
+def process_row(row, nlp, ft_model, col1, col2, use_lemma, use_filter):
+    """Worker function for pandas apply to compute similarity per row."""
+    t1, t2 = row[col1], row[col2]
+    
+    v1 = get_fasttext_vector(t1, nlp, ft_model, use_lemma, use_filter)
+    v2 = get_fasttext_vector(t2, nlp, ft_model, use_lemma, use_filter)
+    
+    return cosine_sim(v1, v2)
 
-    # Method 1: FastText
-    if method in ['fasttext', 'both']:
-        v1 = get_custom_vector(t1, nlp, ft_model, use_lemma, use_filter)
-        v2 = get_custom_vector(t2, nlp, ft_model, use_lemma, use_filter)
-        results['ft_sim'] = cosine_sim(v1, v2)
 
-    # Method 2: spaCy Internal
-    if method in ['spacy', 'both']:
-        # Note: .similarity() on docs uses averaged vectors internally
-        results['spacy_sim'] = nlp(t1).similarity(nlp(t2))
-            
-    return pd.Series(results)
-
-# --- SCRIPT EXECUTION (The "Orchestrator") ---
+##########################################################################################
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description="Semantic Similarity Pipeline")
+    parser = argparse.ArgumentParser(description="fastText Semantic Similarity for German")
     parser.add_argument('--user', required=True)
     parser.add_argument('--exp', required=True)
-    parser.add_argument('--col1', required=True)
-    parser.add_argument('--col2', required=True)
-    parser.add_argument('--method', choices=['fasttext', 'spacy', 'both'], default='both')
-    parser.add_argument('--ft_path', default='cc.de.300.bin')
-    parser.add_argument('--no_lemma', action='store_false', dest='use_lemma')
-    parser.add_argument('--no_filter', action='store_false', dest='use_filter')
+    parser.add_argument('--col1', required=True, help="First column name")
+    parser.add_argument('--col2', required=True, help="Second column name")
+    parser.add_argument('--ft_path', default='cc.de.300.bin', help="Path to fastText bin")
+    parser.add_argument('--no_lemma', action='store_false', dest='use_lemma', help="Disable lemmatization")
+    parser.add_argument('--no_filter', action='store_false', dest='use_filter', help="Disable stopword filter")
     parser.set_defaults(use_lemma=True, use_filter=True)
     args = parser.parse_args()
 
-    # 1. Setup Models
+    # 1. Initialize
+    print("Initializing NLP models...")
     nlp = get_spacy_model("de_core_news_lg")
-    ft = None
-    if args.method in ['fasttext', 'both']:
-        print("Loading FastText...")
-        ft = fasttext.load_model(args.ft_path)
+    ft = fasttext.load_model(args.ft_path)
 
-    # 2. Setup Data
+    # 2. Load Data
     exp_dir = Path(args.user) / args.exp
-    input_path = exp_dir / f"{args.exp}.tsv"
-    df = pd.read_csv(input_path, sep='\t')
+    input_file = exp_dir / f"{args.exp}.tsv"
+    df = pd.read_csv(input_file, sep='\t')
 
-    # 3. Compute (The clean apply call)
-    print(f"Processing similarities for {args.exp}...")
-    sim_df = df.apply(
+    # 3. Compute Similarity
+    col_name = f"{args.col1}_{args.col2}_ft_sim"
+    print(f"Computing similarity for: {col_name}")
+    
+    df[col_name] = df.apply(
         process_row, 
         axis=1, 
-        args=(nlp, ft, args.col1, args.col2, args.method, args.use_lemma, args.use_filter)
+        args=(nlp, ft, args.col1, args.col2, args.use_lemma, args.use_filter)
     )
-    
-    # Combine original data with new similarity columns
-    final_df = pd.concat([df, sim_df], axis=1)
 
-    # 4. Save
-    out_dir = exp_dir / "results" / "similarity"
-    out_dir.mkdir(parents=True, exist_ok=True)
-    out_file = out_dir / f"{args.exp}_{args.method}_sim.tsv"
+    # 4. Export results
+    results_dir = exp_dir / "results" / "similarity"
+    results_dir.mkdir(parents=True, exist_ok=True)
+    out_file = results_dir / f"{args.exp}_ft_sim.tsv"
     
-    final_df.to_csv(out_file, sep='\t', index=False)
-    print(f"Success! Results saved to: {out_file}")
+    df.to_csv(out_file, sep='\t', index=False)
+    print(f"--- Process Complete ---")
+    print(f"Results saved to: {out_file}")
