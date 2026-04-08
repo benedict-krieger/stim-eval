@@ -8,13 +8,25 @@ A collection of tools to evaluate stimulus materials for psycholinguistic experi
 
 Planned branches:
 
-- Local (main)
-- Tortoise CPU server
-- Coli GPU cluster
+- CPU server
+- GPU cluster
 
-Takes tab-separated CSV files as input, which have one stimulus per line.
+## Required Python packages
+Pandas
+Numpy
+Pytorch
+Tranformers
+Matplotlib
+Seaborn
+Wordfreq
+Fasttext
+Spacy
 
-Mandatory columns:
+## Input
+
+Create a user folder within the main directory, and an experiment folder within the user folder.
+Place a tab-separated (.tsv) file (same name as the experiment) in the experiment folder.
+Input files should have one stimulus per line and the following columns:
 
 - "Stimulus": the stimulus sentence including the target word
 - "Target": the target word, must match the target word in the stimulus column
@@ -24,14 +36,28 @@ Mandatory columns:
 
 ## LLM surprisal
 
+Estimates word-by-word surprisal for the stimuli, transforming the original data into a long format.
+
+```python run_surprisal.py --user <USERNAME> --exp <EXPNAME> --llm <LLMNAME>```
+
+The `USERNAME` and `EXPNAME` arguments should match what you have created above.
+Currently, for `LLMNAME` a number of German LLMs are supported, which are listed in config/llms.yaml.
+
+Optional flags:
+
+- `plot`: create density plots for the target word surprisals per condition
+- `merge`: scan results for multiple files from different LLMs and merge them into a single file
+
 Output columns:
 
-- "\[llm_name\]_surp": surprisal estimates from the specified large language model
-- word
-- word_position
-- word_freq
-- word_length
-- is_target
+- `LLMNAME_surp`: surprisal estimates from the specified large language model
+- `word`: untokenized word, surprisal have been summed in case of sub-word splits
+- `word_position`: position of the word in the stimulus sentence
+- `word_freq`: Zipf frequency computed with the Wordfreq library
+- `word_length`: number of characters
+- `is_target`: TRUE for the target word. If the target appears multiple times, only the last occurrence is flagged as TRUE.
 
 
 ## Semantic relatedness
+
+Computes cosine similarity between the fastText embeddings of the words/sentences of two columns of the input data. If a given string has more than one word, embeddings for individual words are summed average
