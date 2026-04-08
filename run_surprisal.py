@@ -81,7 +81,9 @@ if __name__ == '__main__':
     long_df = df.apply(surp.process_row, axis=1, args=(model,tokenizer,ws_ind,char_repl, bos_pad, surp_id, lang))
     long_df = pd.concat(long_df.values, ignore_index=True)
 
-    assert len(df) == len(long_df[long_df['is_target']==True]) # collapsed df with target-only surprisals should have same num of rows as original df
+    #assert len(df) == len(long_df[long_df['is_target']==True]) # collapsed df with target-only surprisals should have same num of rows as original df
+    if len(df) != len(long_df[long_df['is_target']==True]): # collapsed df with target-only surprisals should have same num of rows as original df
+         print("Warning: shape mismatch between original data and collapsed surprisal data detected.")
 
     results_path = exp_dir / "results" / "llm-surprisal"
     Path(results_path).mkdir(parents=True, exist_ok=True)

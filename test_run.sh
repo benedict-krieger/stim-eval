@@ -3,8 +3,8 @@
 set -e 
 
 USER_NAME="ben"
-EXP_NAME="adbc23_short"
-MODELS=("gerpt2" "gerpt2large" "leo13b" "llammlein120m" 'llammlein1b' 'llammlein7b')
+EXP_NAME="test"
+MODELS=("gerpt2" "gerpt2large")
 
 echo "==========================================="
 echo "STARTING PIPELINE: $EXP_NAME"
