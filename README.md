@@ -60,4 +60,11 @@ Output columns:
 
 ## Semantic relatedness
 
-Computes cosine similarity between the fastText embeddings of the words/sentences of two columns of the input data. If a given string has more than one word, embeddings for individual words are summed average
+Computes cosine similarity between the fastText embeddings of the words/sentences of two columns of the input data. If a given string has more than one word, an average representation across individual words is computed. Words are lemmatized and stopwords are removed using spaCy.
+
+```python semantic_sim.py --user <USERNAME> --exp <EXPNAME> --col1 <COL1NAME> --col2 <COL2NAME>```
+
+Optional flags:
+
+- `no_lemma`: disable lemmatization
+- `no_filter`: disable stopword filtering
