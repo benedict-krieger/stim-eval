@@ -25,7 +25,7 @@ Spacy
 ## Input
 
 Create a folder with your `<USERNAME>` within the `users` directory, and an experiment folder with `<EXPNAME>` within this user folder.
-Place a tab-separated (.tsv) file (also named as `<EXPNAME>`) in the experiment folder.
+Place a tab-separated file, named as `<EXPNAME>.tsv`, in the experiment folder.
 Input tsv files should have one stimulus per line and the following columns:
 
 - "Stimulus": the stimulus sentence including the target word
