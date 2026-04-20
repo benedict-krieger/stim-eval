@@ -75,7 +75,7 @@ if __name__ == '__main__':
 
 
     print(f"Data: {args.exp}")
-    exp_dir = Path(args.user) / args.exp
+    exp_dir = Path(f"users/{args.user}") / args.exp
     input_file = exp_dir / f"{args.exp}.tsv"
     df = pd.read_csv(input_file, sep ="\t")
     long_df = df.apply(surp.process_row, axis=1, args=(model,tokenizer,ws_ind,char_repl, bos_pad, surp_id, lang))

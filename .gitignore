@@ -212,6 +212,8 @@ __marimo__/
 ################
 
 *.csv
-ben
-ben_run*
-cc.de.*
+users/*
+!users/.gitkeep
+#ben_run*
+*.sh
+cc.*

@@ -4,15 +4,37 @@ import pandas as pd
 import fasttext
 import spacy
 from pathlib import Path
+import yaml
+import os
 
 
-def get_spacy_model(model_name="de_core_news_lg"):
+def get_spacy_model(lang):
     """Load spaCy model for stop word removal and lemmatization."""
+
+    with open("config/spacy.yaml", "r") as f:
+        config = yaml.safe_load(f)
+        model_name = config[lang]
+
     try:
         return spacy.load(model_name)
     except OSError:
         print(f"Error: {model_name} not found. Run: python -m spacy download {model_name}")
         exit(1)
+
+
+def get_ft_model(lang):
+    """Load fastText model"""
+
+    with open("config/fasttext.yaml", "r") as f:
+        config = yaml.safe_load(f)
+        model_name = config[lang]
+
+    root_dir = Path(os.getenv("MODELS_DIR", "."))
+
+    model_path = root_dir / model_name
+
+    return fasttext.load_model(str(model_path))
+
 
 def cosine_sim(v1, v2):
     """Computes angular distance between two word/sentence vectors."""
@@ -70,6 +92,7 @@ if __name__ == '__main__':
     parser.add_argument('--exp', required=True)
     parser.add_argument('--col1', required=True, help="First column name")
     parser.add_argument('--col2', required=True, help="Second column name")
+    parser.add_argument('--lang', required=True, help="German:de, English:en")
     parser.add_argument('--ft_path', default='cc.de.300.bin', help="Path to fastText bin")
     parser.add_argument('--no_lemma', action='store_false', dest='use_lemma', help="Disable lemmatization")
     parser.add_argument('--no_filter', action='store_false', dest='use_filter', help="Disable stopword filter")
@@ -78,11 +101,11 @@ if __name__ == '__main__':
 
     # 1. Initialize
     print("Initializing NLP models...")
-    nlp = get_spacy_model("de_core_news_lg")
-    ft = fasttext.load_model(args.ft_path)
+    nlp = get_spacy_model(args.lang)
+    ft = get_ft_model(args.lang)
 
     # 2. Load Data
-    exp_dir = Path(args.user) / args.exp
+    exp_dir = Path(f"users/{args.user}") / args.exp
     input_file = exp_dir / f"{args.exp}.tsv"
     df = pd.read_csv(input_file, sep='\t')
 

@@ -15,7 +15,7 @@ Planned branches:
 Pandas
 Numpy
 Pytorch
-Tranformers
+Transformers
 Matplotlib
 Seaborn
 Wordfreq
@@ -24,9 +24,9 @@ Spacy
 
 ## Input
 
-Create a user folder within the main directory, and an experiment folder within the user folder.
-Place a tab-separated (.tsv) file (same name as the experiment) in the experiment folder.
-Input files should have one stimulus per line and the following columns:
+Create a folder with your `<USERNAME>` within the `users` directory, and an experiment folder with `<EXPNAME>` within this user folder.
+Place a tab-separated (.tsv) file (also named as `<EXPNAME>`) in the experiment folder.
+Input tsv files should have one stimulus per line and the following columns:
 
 - "Stimulus": the stimulus sentence including the target word
 - "Target": the target word, must match the target word in the stimulus column
