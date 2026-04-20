@@ -29,7 +29,7 @@ def get_ft_model(lang):
         config = yaml.safe_load(f)
         model_name = config[lang]
 
-    root_dir = Path(os.getenv("MODELS_DIR", "."))
+    root_dir = Path(os.getenv("FT_MODELS", "."))
 
     model_path = root_dir / model_name
 
