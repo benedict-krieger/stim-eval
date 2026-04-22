@@ -99,6 +99,7 @@ if __name__ == '__main__':
     parser.set_defaults(use_lemma=True, use_filter=True)
     args = parser.parse_args()
 
+    print("--- Computing fastText similarities ---")
     # 1. Initialize
     print("Initializing NLP models...")
     nlp = get_spacy_model(args.lang)

@@ -8,6 +8,7 @@ from wordfreq import zipf_frequency
 import yaml
 from pathlib import Path
 import surprisal as surp
+from tqdm import tqdm
 
 def get_llm_config(llm_name):
     '''Load model config'''
@@ -62,6 +63,7 @@ if __name__ == '__main__':
     bos_pad = llm_cfg['bos_pad']
     lang = llm_cfg['lang']
 
+    print("--- Computing LLM surprisal ---")
 
     print(f'Model id: {args.llm}')
     device_arg = "auto" if torch.cuda.is_available() else None
@@ -72,12 +74,15 @@ if __name__ == '__main__':
     print(f"Model on {model.device}")
 
 
-    print(f"Data: {args.exp}")
+    print(f"Experiment: {args.exp}")
     exp_dir = Path(f"users/{args.user}") / args.exp
     input_file = exp_dir / f"{args.exp}.tsv"
     df = pd.read_csv(input_file, sep ="\t")
-    long_df = df.apply(surp.process_row, axis=1, args=(model,tokenizer,ws_ind,char_repl, bos_pad, surp_id, lang))
-    long_df = pd.concat(long_df.values, ignore_index=True)
+    rows = []
+    for _, row in tqdm(df.iterrows(), total=len(df), desc="Processing rows"):
+        rows.append(surp.process_row(row, model, tokenizer, ws_ind, char_repl, bos_pad, surp_id, lang))
+
+    long_df = pd.concat(rows, ignore_index=True)
 
     #assert len(df) == len(long_df[long_df['is_target']==True]) # collapsed df with target-only surprisals should have same num of rows as original df
     if len(df) != len(long_df[long_df['is_target']==True]): # collapsed df with target-only surprisals should have same num of rows as original df
@@ -88,6 +93,7 @@ if __name__ == '__main__':
     long_df.to_csv( results_path / f'{args.exp}_{args.llm}.tsv', sep='\t', index = False)
     
     if args.plot:
+         print("Producing density plots")
          exp_cfg = get_exp_config(args.exp)
          params = get_plot_params(exp_cfg, args.exp, args.llm)
 
@@ -109,3 +115,6 @@ if __name__ == '__main__':
                                   title=params['title'],
                                   c_palette=params['c_palette'],
                                   show_legend=params['show_legend'])
+         
+    print(f"--- Process Complete ---")
+    print(f"Results saved to:", results_path / f'{args.exp}_{args.llm}.tsv')
