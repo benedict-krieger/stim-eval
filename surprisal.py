@@ -166,7 +166,8 @@ def get_word_freqs(word_list, lang):
 
 def merge_surprisal(user,exp):
 
-    results_dir = Path(user) / exp / "results" / "llm-surprisal"
+    results_dir = Path("users")/ user / exp / "results" / "llm-surprisal"
+    print(f"Merging surprisal output in {results_dir}")
     files = [f for f in results_dir.glob("*.tsv") if "_merged.tsv" not in f.name] # ignore merged files
     
     if len(files) < 2:

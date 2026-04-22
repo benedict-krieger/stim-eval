@@ -46,7 +46,6 @@ Currently, for `LLMNAME` a number of German LLMs are supported, which are listed
 Optional flags:
 
 - `plot`: create density plots for the target word surprisals per condition
-- `merge`: scan results for multiple files from different LLMs and merge them into a single file
 
 Output columns:
 
@@ -56,6 +55,13 @@ Output columns:
 - `word_freq`: Zipf frequency computed with the Wordfreq library
 - `word_length`: number of characters
 - `is_target`: TRUE for the target word. If the target appears multiple times, only the last occurrence is flagged as TRUE.
+
+
+After running two or more LLMs on the same experiment, you can create a merged output file with the surprisal estimates of all the individual LLMs for convenience:
+
+```python merge_surprisal.py --user <USERNAME> --exp <EXPNAME>```
+
+This will scan the results directory for multiple files from different LLMs and merge them into a single file.
 
 
 ## Semantic relatedness

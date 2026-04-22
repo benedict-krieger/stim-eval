@@ -50,8 +50,6 @@ if __name__ == '__main__':
     parser.add_argument('--user',help=f'User name, for which a sub-directory must exist')
     parser.add_argument('--exp',help = f'Name of experiment and input tsv file')
     parser.add_argument('--llm',help = f'Models:{all_models}')
-    parser.add_argument('--merge', action='store_true')
-    #parser.set_defaults(merge=False)
     parser.add_argument('--plot', action='store_true', help='Generate KDE plots')
     args = parser.parse_args()
 
@@ -88,10 +86,7 @@ if __name__ == '__main__':
     results_path = exp_dir / "results" / "llm-surprisal"
     Path(results_path).mkdir(parents=True, exist_ok=True)
     long_df.to_csv( results_path / f'{args.exp}_{args.llm}.tsv', sep='\t', index = False)
-
-    if args.merge:
-         surp.merge_surprisal(args.user, args.exp)
-        
+    
     if args.plot:
          exp_cfg = get_exp_config(args.exp)
          params = get_plot_params(exp_cfg, args.exp, args.llm)

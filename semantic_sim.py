@@ -87,7 +87,7 @@ def process_row(row, nlp, ft_model, col1, col2, use_lemma, use_filter):
 ##########################################################################################
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description="fastText Semantic Similarity for German")
+    parser = argparse.ArgumentParser(description="fastText Semantic Similarity")
     parser.add_argument('--user', required=True)
     parser.add_argument('--exp', required=True)
     parser.add_argument('--col1', required=True, help="First column name")

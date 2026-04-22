@@ -23,7 +23,7 @@ done
 FIRST_MODEL=${MODELS[0]}
 echo ">>> Merging..."
 
-python run_surprisal.py --user "$USER_NAME" --exp "$EXP_NAME" --llm "$FIRST_MODEL" --merge
+python merge_surprisal.py --user "$USER_NAME" --exp "$EXP_NAME"
 
 echo "==========================================="
 echo "PIPELINE COMPLETE"
