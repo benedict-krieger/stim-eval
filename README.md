@@ -68,9 +68,11 @@ This will scan the results directory for multiple files from different LLMs and 
 
 Computes cosine similarity between the fastText embeddings of the words/sentences of two columns of the input data. If a given string has more than one word, an average representation across individual words is computed. Words are lemmatized and stopwords are removed using spaCy.
 
-```python semantic_sim.py --user <USERNAME> --exp <EXPNAME> --col1 <COL1NAME> --col2 <COL2NAME>```
+```python semantic_sim.py --user <USERNAME> --exp <EXPNAME> --col1 <COL1NAME> --col2 <COL2NAME> --lang <LANG>```
 
 Optional flags:
 
 - `no_lemma`: disable lemmatization
 - `no_filter`: disable stopword filtering
+
+Currently supported languages: German (`de`), English (`en`).
