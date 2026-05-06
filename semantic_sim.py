@@ -61,7 +61,7 @@ def get_fasttext_vector(text, nlp, ft_model, use_lemma, use_filter):
     tokens = []
     for token in doc:
         # Optional filtering: stopwords and punctuation
-        if use_filter and (token.is_stop or token.is_punct):
+        if use_filter and len(doc) > 1 and (token.is_stop or token.is_punct):
             continue
         # Optional lemmatization
         t = token.lemma_ if use_lemma else token.text
