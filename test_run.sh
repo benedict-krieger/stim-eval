@@ -2,9 +2,9 @@
 
 set -e 
 
-USER_NAME="ben"
+USER_NAME="testuser"
 EXP_NAME="test"
-MODELS=("gerpt2" "gerpt2large")
+MODELS=("gerpt2" "llammlein120m")
 
 echo "==========================================="
 echo "STARTING PIPELINE: $EXP_NAME"
