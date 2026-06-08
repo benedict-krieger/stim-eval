@@ -1,3 +1,6 @@
+dabc25:
+  c_palette: ["#0A6FB8","#2FBF71","#9558B2","#EA801C"]
+
 adbc23:
   c_labels: {'A':'A: Plausible','B':'B: Less plausible','C':'C: Implausible'}
   c_palette: ['black','red','blue']
