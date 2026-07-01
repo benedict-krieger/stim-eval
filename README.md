@@ -79,7 +79,9 @@ The LLM config currently has these models:
 
 Computes cosine similarity between the fastText embeddings of the words/sentences of two columns of the input data. If a given string has more than one word, an average representation across individual words is computed. Words are lemmatized and stopwords are removed using spaCy.
 
-```python semantic_sim.py --user <USERNAME> --exp <EXPNAME> --col1 <COL1NAME> --col2 <COL2NAME> --lang <LANG>```
+```python semantic_sim.py --user <USERNAME> --exp <EXPNAME> --model <MODELNAME> --col1 <COL1NAME> --col2 <COL2NAME> --lang <LANG>```
+
+`<MODELNAME>`: `ft` for fastText, or an LLM name to use input embeddings (does not seem to work well)
 
 Optional flags:
 
