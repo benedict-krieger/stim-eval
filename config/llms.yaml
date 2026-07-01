@@ -51,3 +51,12 @@ gerpt2large: # 36 layers
   char_repl: True
   bos_pad: True
   lang: 'de'
+
+gpt2ko: # 12 layers
+  repo_id: 'mykor/gpt2-ko'
+  surp_id: 'gpt2ko_surp'
+  bpe_id: 'gpt2ko_bpe_split'
+  ws_ind: 'Ġ'
+  char_repl: True
+  bos_pad: True
+  lang: 'ko'

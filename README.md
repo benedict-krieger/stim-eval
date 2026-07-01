@@ -63,6 +63,17 @@ After running two or more LLMs on the same experiment, you can create a merged o
 
 This will scan the results directory for multiple files from different LLMs and merge them into a single file.
 
+The LLM config currently has these models:
+
+| LLM | Language | Architecture | Parameters | Layers | Hidden size | Vocabulary |
+| --- | --- | --- | --- | --- | --- | --- |
+| llammlein120m | DE | Llama-2 | 125M | 12 | 768 | 32,064 |
+| gerpt2 | DE | GPT-2 | 163M | 12 | 768 | 50,257 |
+| gerpt2large | DE | GPT-2 | 774M | 36 | 1280 | 50,257 |
+| llammlein1b | DE | Llama-2 | 1.1B | 22 | 2,048 | 32,064 |
+| llammlein7b | DE | Llama-2 | 6,7B | 32 | 4,096 | 32,064 |
+| leo13b | DE | Llama-2 | 13B | 40 | 5,120 | 32,000 |
+| gpt2ko | KO | GPT-2 | 124M | 12 | 768 | 50,265 |
 
 ## Semantic relatedness
 
@@ -75,4 +86,4 @@ Optional flags:
 - `no_lemma`: disable lemmatization
 - `no_filter`: disable stopword filtering
 
-Currently supported languages: German (`de`), English (`en`).
+Currently supported languages: German (`de`), English (`en`), Korean (`ko`)

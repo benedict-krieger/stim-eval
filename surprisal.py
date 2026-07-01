@@ -107,13 +107,9 @@ def get_surprisal(input_str, model, tokenizer, ws_ind, char_repl, bos_pad):
                 temp_surprisal = 0
                 temp_token = ""
             i += 1
+    
     if char_repl:
-        replace_dict = {'ÃĦ':'Ä','Ã¤':'ä','Ãĸ':'Ö','Ã¶':'ö','Ãľ':'Ü','Ã¼':'ü',
-                        'ÃŁ':'ß','âĢľ':'“','âĢŀ':'„','Ãł':'à','ÃĢ':'À','Ã¡':'á',
-                        'Ãģ':'Á','Ã¨':'è','ÃĪ':'È','Ã©':'é','Ãī':'É','Ã»':'û',
-                        'ÃĽ':'Û','ÃŃ':'í','âĢĵ':'–','âĢĻ':'’'}
-        for k in replace_dict.keys():
-            words = [w.replace(k,replace_dict[k]) for w in words]
+        words = [tokenizer.convert_tokens_to_string([w]) for w in words]
 
     return words, surprisals
 
@@ -160,7 +156,7 @@ def process_row(row, model, tokenizer, ws_ind, char_repl, bos_pad, surp_id, lang
     })
 
 def get_word_freqs(word_list, lang):
-    zipf_freqs = [zipf_frequency(w, lang, 'large') for w in word_list]
+    zipf_freqs = [zipf_frequency(w, lang, 'best') for w in word_list]
     return zipf_freqs
 
 
