@@ -214,7 +214,7 @@ __marimo__/
 *.csv
 users/*
 !users/.gitkeep
-#ben_run*
-*.sh
+ben_run*
+test_run*
 cc.*
 ben_plot_sem_sims.py
