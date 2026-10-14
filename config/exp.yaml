@@ -5,20 +5,31 @@ adbc23:
   c_labels: {'A':'A: Plausible','B':'B: Less plausible','C':'C: Implausible'}
   c_palette: ['black','red','blue']
   #title: 'Aurnhammer et al. (2023)'
-  x_lim: 30
-  y_lim: 0.2
+  #x_lim: 30
+  #y_lim: 0.2
   #show_legend: False
 
 adbc23_short:
   c_labels: {'A':'A: Plausible','B':'B: Less plausible','C':'C: Implausible'}
   c_palette: ['black','red','blue']
   #title: 'Aurnhammer et al. (2023) short'
-  x_lim: 30
-  y_lim: 0.2
+  #x_lim: 30
+  #y_lim: 0.2
 
 dbc19:
   c_labels: { 'A':'A: Baseline','B':'B: Event-related violation','C':'C: Event-unrelated violation'}
   c_palette: ['black','red','blue']
-  #title: 'Aurnhammer et al. (2023) short'
-  x_lim: 44
-  y_lim: 0.04
+  #title: 'Delogu et al. (2019)'
+  #x_lim: 44
+  #y_lim: 0.04
+
+dbc21:
+  c_labels: { 'A':'A: Baseline','B':'B: Event-related violation','C':'C: Event-unrelated violation'}
+  c_palette: ['black','red','blue']
+  #title: 'Delogu et al. (2021)'
+  #x_lim: 44
+  #y_lim: 0.04
+
+adsbc21:
+  c_palette: ["#000000", "#BB5566", "#004488", "#DDAA33"]
+  #title: 'Aurnhammer et al. (2021)'

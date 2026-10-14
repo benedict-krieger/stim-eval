@@ -12,7 +12,7 @@ from tqdm import tqdm
 
 def get_llm_config(llm_name):
     '''Load model config'''
-    with open("config/llms.yaml", "r") as f:
+    with open("../config/llms.yaml", "r") as f:
         llms = yaml.safe_load(f)
         llm_cfg = llms[llm_name]
 
@@ -22,7 +22,7 @@ def get_exp_config(expname):
     """
     Attempts to find plot settings based on the input expname.
     """
-    with open("config/exp.yaml", "r") as f:
+    with open("../config/exp.yaml", "r") as f:
             all_configs = yaml.safe_load(f)
     
     # Look for the expname (e.g., 'test' from 'test.tsv')
@@ -75,7 +75,7 @@ if __name__ == '__main__':
 
 
     print(f"Experiment: {args.exp}")
-    exp_dir = Path(f"users/{args.user}") / args.exp
+    exp_dir = Path(f"../users/{args.user}") / args.exp
     input_file = exp_dir / f"{args.exp}.tsv"
     df = pd.read_csv(input_file, sep ="\t")
     rows = []
