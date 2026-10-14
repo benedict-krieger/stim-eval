@@ -1,5 +1,24 @@
+# Model configs for run_surprisal.py
+#
+# repo_id   : Hugging Face Hub id. Fallback when no local copy exists (e.g. local machine).
+# local_dir : (optional) folder name of a local copy. run_surprisal.py looks for it under
+#             --model_dir (on the cluster: /local/common_models, set in run.sh).
+# dtype     : precision the weights are loaded in ('float32' or 'bfloat16').
+
+leo70b: # 80 layers, Llama-2 architecture
+  repo_id: 'LeoLM/leo-hessianai-70b'
+  local_dir: 'leo-hessianai-70b'
+  dtype: 'bfloat16' # 70B weights are stored in 16 bit anyway
+  surp_id: 'leo70b_surp'
+  bpe_id: 'leo70b_bpe_split'
+  ws_ind: '▁' # Unicode code point is U+2581, not U+005F
+  char_repl: False
+  bos_pad: False
+  lang: 'de'
+
 leo13b:
   repo_id: 'LeoLM/leo-hessianai-13b'
+  dtype: 'float32'
   surp_id: 'leo13b_surp'
   bpe_id: 'leo13b_bpe_split'
   ws_ind: '▁' # Unicode code point is U+2581, not U+005F
@@ -9,6 +28,7 @@ leo13b:
 
 llammlein7b: # 32 layers
   repo_id: 'LSX-UniWue/LLaMmlein_7B'
+  dtype: 'float32'
   surp_id: 'llammlein7b_surp'
   bpe_id: 'llammlein7b_bpe_split'
   ws_ind: '▁' # Unicode code point is U+2581, not U+005F
@@ -18,6 +38,7 @@ llammlein7b: # 32 layers
 
 llammlein1b: # 22 layers
   repo_id: 'LSX-UniWue/LLaMmlein_1B'
+  dtype: 'float32'
   surp_id: 'llammlein1b_surp'
   bpe_id: 'llammlein1b_bpe_split'
   ws_ind: '▁' # Unicode code point is U+2581, not U+005F
@@ -27,6 +48,7 @@ llammlein1b: # 22 layers
 
 llammlein120m: # 12 layers
   repo_id: 'LSX-UniWue/LLaMmlein_120M'
+  dtype: 'float32'
   surp_id: 'llammlein120m_surp'
   bpe_id: 'llammlein120m_bpe_split'
   ws_ind: '▁' # Unicode code point is U+2581, not U+005F
@@ -36,6 +58,7 @@ llammlein120m: # 12 layers
 
 gerpt2: # 12 layers
   repo_id: 'benjamin/gerpt2'
+  dtype: 'float32'
   surp_id: 'gerpt2_surp'
   bpe_id: 'gerpt2_bpe_split'
   ws_ind: 'Ġ'
@@ -45,6 +68,7 @@ gerpt2: # 12 layers
 
 gerpt2large: # 36 layers
   repo_id: 'benjamin/gerpt2-large'
+  dtype: 'float32'
   surp_id: 'gerpt2large_surp'
   bpe_id: 'gerpt2large_bpe_split'
   ws_ind: 'Ġ'
@@ -54,6 +78,7 @@ gerpt2large: # 36 layers
 
 gpt2ko: # 12 layers
   repo_id: 'mykor/gpt2-ko'
+  dtype: 'float32'
   surp_id: 'gpt2ko_surp'
   bpe_id: 'gpt2ko_bpe_split'
   ws_ind: 'Ġ'

@@ -1,0 +1,17 @@
+universe       = vanilla
+initialdir     = /scratch/beneschn/projects/stim-eval
+executable     = scripts/run.sh
+# arguments: <llm> <user> <exp1> [<exp2> ...]
+arguments      = leo70b beneschn adsbc21 dbc19 dbc21
+
+output         = logs/run.sh.$(batch_name).$(ClusterId).$(Year)_$(Month)_$(Day)_$(SUBMIT_TIME).out
+error          = logs/run.sh.$(batch_name).$(ClusterId).$(Year)_$(Month)_$(Day)_$(SUBMIT_TIME).err
+log            = logs/run.sh.$(batch_name).$(ClusterId).$(Year)_$(Month)_$(Day)_$(SUBMIT_TIME).log
+
+request_gpus   = 4
+requirements = (GPUs_GlobalMemoryMb >= 80000)
+
+request_cpus   = 8
+request_memory = 64GB
+
+queue 1
