@@ -68,6 +68,7 @@ gerpt2: # 12 layers
 
 gerpt2large: # 36 layers
   repo_id: 'benjamin/gerpt2-large'
+  local_dir: 'gerpt2-large'
   dtype: 'float32'
   surp_id: 'gerpt2large_surp'
   bpe_id: 'gerpt2large_bpe_split'

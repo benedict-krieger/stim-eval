@@ -11,7 +11,7 @@ shift 2
 EXPS=("$@")
 
 PROJECT_DIR="/scratch/beneschn/projects/stim-eval"      
-CONDA_SH="/scratch/beneschn/miniconda3/etc/profile.d/conda.sh"
+CONDA_SH="/scratch/beneschn/miniconda/etc/profile.d/conda.sh"
 SHARED_MODELS="/scratch/common_models"                  # network copy (slow-ish)
 LOCAL_MODELS="/local/common_models"                     # node-local copy (fast)
 
